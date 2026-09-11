@@ -20,3 +20,6 @@ File or Folder | Purpose
 ## Learn More
 
 Learn more at <https://cap.cloud.sap>.
+
+# Reference
+[SAP BTP Developer's Guide](https://github.com/SAP-samples/btp-developer-guide-cap)

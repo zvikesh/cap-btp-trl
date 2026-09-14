@@ -9,7 +9,7 @@ using {
  * `cuid` adds a unique identifier and `managed` adds administrative fields such as
  * `createdAt` and `createdBy`.
  */
-namespace sap.capire.incidents;
+namespace sap.capire.incidents; //To avoid name conflict with another db microservice
 
 /**
  * Incidents created by customers.
@@ -18,16 +18,14 @@ namespace sap.capire.incidents;
  * history composed of individual messages.
 */
 entity Incidents : cuid, managed {
-    customer     : Association to Customers;
     title        : String @title: 'Title';
+    /* Associations */
+    customer     : Association to Customers;
     urgency      : Association to Urgency default 'M';
     status       : Association to Status default 'N';
-    conversation : Composition of many {
-                       key ID        : UUID;
-                           timestamp : type of managed : createdAt;
-                           author    : type of managed : createdBy;
-                           message   : String;
-                   };
+    /* Compositions */
+    conversation : Composition of many Conversations
+                       on conversation.incident = $self;
 }
 
 /**
@@ -40,17 +38,27 @@ entity Customers : managed {
     key ID           : String;
         firstName    : String;
         lastName     : String;
-        /**
-         * Convenience name derived from first and last name.
-         */
-        name         : String = trim(firstName || ' ' || lastName);
+        name         : String = trim(firstName || ' ' || lastName); //Convenience name derived from first and last name.
         email        : EMailAddress;
         phone        : PhoneNumber;
-        incidents    : Association to many Incidents
-                           on incidents.customer = $self;
         creditCardNo : String(16) @assert.format: '^[1-9]\d{15}$';
+        /* Associations */
+        incidents: Association to many Incidents
+                           on incidents.customer = $self;
+        /* Compositions */
         addresses    : Composition of many Addresses
                            on addresses.customer = $self;
+}
+
+/**
+ * Conversation messages belonging to incidents.
+ */
+entity Conversations : managed {
+    key ID      : UUID;
+    incident    : Association to Incidents;
+    timestamp   : type of managed : createdAt;
+    author      : type of managed : createdBy;
+    message     : String;
 }
 
 /**

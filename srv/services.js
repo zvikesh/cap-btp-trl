@@ -1,6 +1,6 @@
-const cds = require('@sap/cds')
+import cds from '@sap/cds'
 
-class ProcessorService extends cds.ApplicationService {
+export class ProcessorService extends cds.ApplicationService {
   init() {
 
     const { Incidents } = this.entities
@@ -20,5 +20,3 @@ class ProcessorService extends cds.ApplicationService {
     return super.init()
   }
 }
-
-module.exports = { ProcessorService }
